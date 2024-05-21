@@ -93,3 +93,27 @@ def add_record(request):
     else:
         messages.success(request, "You Must Be Logged In...")
         return redirect('home')
+
+
+
+def update_record(request, pk):
+	if request.user.is_authenticated:
+		current_record = Record.objects.get(id=pk)
+        
+        ## first step ------  pass instance of current_record --- propogate form ((fill form with already available data))
+        ## second step ------ request.POST (user want to post the form)---- None(user is editing the form and want to post)
+		form = AddRecordForm(request.POST or None, instance=current_record)
+            
+		if form.is_valid():
+			form.save()
+			messages.success(request, "Record Has Been Updated!")
+			return redirect('home')
+
+        ## when before POSTing of form, update_record.html is rendered and 
+        ## then, again form.is_valid function of if statement is run if form POST is happened (update_record view run twice) self note sn=
+		return render(request, 'update_record.html', {'form':form})
+      
+	else:
+            
+		messages.success(request, "You Must Be Logged In...")
+		return redirect('home')
